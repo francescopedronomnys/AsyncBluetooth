@@ -1,14 +1,13 @@
 //  Copyright (c) 2021 Manuel Fernandez-Peix Perez. All rights reserved.
 
 import Foundation
-import os.log
 
 /// Executes work in parallel when keys are different, and serially when there's work queued for a given key.
 /// After work for a given key has started, this class will await until the client completes it before taking
 /// on the next work for that key.
 actor AsyncExecutorMap<Key, Value> where Key: Hashable {
     
-    private static var logger: Logger {
+    private static var logger: CustomLogger {
         Logging.logger(for: "asyncExecuterMap")
     }
     

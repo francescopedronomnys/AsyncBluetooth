@@ -3,7 +3,6 @@
 import Foundation
 @preconcurrency import CoreBluetooth
 import Combine
-import os.log
 
 /// An object that scans for, discovers, connects to, and manages peripherals using concurrency.
 public final class CentralManager: Sendable {
@@ -18,7 +17,7 @@ public final class CentralManager: Sendable {
         }
     }
     
-    private static var logger: Logger {
+    private static var logger: CustomLogger {
         Logging.logger(for: "centralManager")
     }
     
@@ -235,7 +234,7 @@ public final class CentralManager: Sendable {
 extension CentralManager.DelegateWrapper: CBCentralManagerDelegate {
     private typealias Utils = CentralManagerUtils
     
-    private static var logger: Logger = {
+    private static var logger: CustomLogger = {
         CentralManager.logger
     }()
     
@@ -268,7 +267,7 @@ extension CentralManager.DelegateWrapper: CBCentralManagerDelegate {
         Task {
             guard let continuation = await self.context.scanForPeripheralsContext.continuation else {
                 let peripherlName = scanData.peripheral.name ?? "unknown"
-                Self.logger.info("Ignoring peripheral '\(peripherlName, privacy: .private)' because the central manager is not scanning")
+                Self.logger.info("Ignoring peripheral '\(peripherlName)' because the central manager is not scanning")
                 return
             }
             continuation.yield(scanData)

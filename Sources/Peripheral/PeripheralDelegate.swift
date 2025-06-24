@@ -2,11 +2,10 @@
 
 import Foundation
 import CoreBluetooth
-import os.log
 
 final class PeripheralDelegate: NSObject, Sendable {
     
-    private static var logger: Logger {
+    private static var logger: CustomLogger {
         Logging.logger(for: "peripheralDelegate")
     }
 

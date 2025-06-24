@@ -3,13 +3,12 @@
 import Foundation
 @preconcurrency import CoreBluetooth
 import Combine
-import os.log
 
 /// A remote peripheral device.
 /// - This class acts as a wrapper around `CBPeripheral`.
 public final class Peripheral: Sendable {
         
-    private static var logger: Logger {
+    private static var logger: CustomLogger {
         Logging.logger(for: "peripheral")
     }
     
