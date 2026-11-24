@@ -9,7 +9,7 @@ import Combine
 public final class Peripheral: Sendable {
         
     private static var logger: CustomLogger {
-        Logging.logger(for: "peripheral")
+        Logging.createLogger(for: "peripheral")
     }
     
     /// Publishes characteristics that are notifying of value changes.
