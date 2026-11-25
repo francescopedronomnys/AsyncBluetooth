@@ -18,7 +18,7 @@ public final class CentralManager: Sendable {
     }
     
     private static var logger: CustomLogger {
-        Logging.logger(for: "centralManager")
+        Logging.createLogger(for: "centralManager")
     }
     
     public var bluetoothState: CBManagerState {
@@ -183,11 +183,11 @@ public final class CentralManager: Sendable {
     
     /// Cancels all pending operations, stops scanning and awaiting for any responses.
     /// - Note: Operation for Peripherals will not be cancelled. To do that, call `cancelAllOperations()` on the `Peripheral`.
-    public func cancelAllOperations() async throws {
+    public func cancelAllOperations() async {
         if await isScanning {
             await self.stopScan()
         }
-        try await self.context.flush(error: BluetoothError.operationCancelled)
+        await self.context.flush(error: BluetoothError.operationCancelled)
     }
 
     /// Returns a Boolean that indicates whether the device supports a specific set of features.
@@ -362,28 +362,6 @@ extension CentralManager.DelegateWrapper: CBCentralManagerDelegate {
         
         self.context.eventSubject.send(
             .didDisconnectPeripheral(peripheral: peripheral, isReconnecting: isReconnecting, error: error)
-        )
-    }
-    
-    func centralManager(
-        _ cbCentralManager: CBCentralManager,
-        didDisconnectPeripheral peripheral: CBPeripheral,
-        error: Error?
-    ) {
-        Task {
-            do {
-                let result = CallbackUtils.result(for: (), error: error)
-                try await self.context.cancelPeripheralConnectionExecutor.setWorkCompletedForKey(
-                    peripheral.identifier, result: result
-                )
-                Self.logger.info("Disconnected from \(peripheral.identifier)")
-            } catch {
-                Self.logger.info("Disconnected from \(peripheral.identifier) without a continuation")
-            }
-        }
-        
-        self.context.eventSubject.send(
-            .didDisconnectPeripheral(peripheral: Peripheral(peripheral), isReconnecting: false, error: error)
         )
     }
 }

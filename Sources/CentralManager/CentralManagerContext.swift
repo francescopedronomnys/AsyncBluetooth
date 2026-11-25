@@ -30,7 +30,7 @@ actor CentralManagerContext {
         }
     }
     
-    nonisolated private(set) lazy var eventSubject = PassthroughSubject<CentralManagerEvent, Never>()
+    nonisolated let eventSubject = PassthroughSubject<CentralManagerEvent, Never>()
     
     private(set) lazy var waitUntilReadyExecutor = {
         let executor = AsyncSerialExecutor<Void>()
@@ -58,7 +58,7 @@ actor CentralManagerContext {
     
     private var flushableExecutors: ThreadSafeArray<FlushableExecutor> = []
     
-    func flush(error: Error) async throws {
+    func flush(error: Error) async {
         for await flushableExecutor in flushableExecutors {
             await flushableExecutor.flush(error: error)
         }

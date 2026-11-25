@@ -4,40 +4,34 @@ import Foundation
 import os.log
 
 public final class AsyncBluetoothLogging: Sendable {
-    
+
     private(set) static var isEnabled = true
-    
-    private static var loggerFactory: (String, String) -> CustomLogger = { subsystem, category in DefaultLogger(subsystem: subsystem, category: category) }
-    private static var loggers: [String: CustomLogger] = [:]
-    private static let disabledLogger = Logger(OSLog.disabled)
-    
+
+    private static var loggerFactory: (String, String) -> CustomLogger = { subsystem, category in
+        DefaultLogger(subsystem: subsystem, category: category)
+    }
+
     public static func setEnabled(_ isEnabled: Bool) {
         Self.isEnabled = isEnabled
     }
-    
+
     public static func setLoggerFactory(_ factory: @escaping (String, String) -> CustomLogger) {
         Self.loggerFactory = factory
     }
-    
+
     public static func resetLoggerFactory() {
-        Self.loggerFactory = { subsystem, category in DefaultLogger(subsystem: subsystem, category: category) }
-    }
-    
-    static func logger(for category: String) -> CustomLogger {
-        guard Self.isEnabled else { return DisabledLogger() }
-        
-        if let logger = Self.loggers[category] {
-            return logger
+        Self.loggerFactory = { subsystem, category in
+            DefaultLogger(subsystem: subsystem, category: category)
         }
-        
-        let logger = loggerFactory(
+    }
+
+    static func createLogger(for category: String) -> CustomLogger {
+        guard Self.isEnabled else { return DisabledLogger() }
+
+        return loggerFactory(
             Bundle(for: CentralManager.self).bundleIdentifier ?? "",
             category
         )
-        
-        Self.loggers[category] = logger
-        
-        return logger
     }
 }
 
@@ -84,49 +78,49 @@ public struct DefaultLogger: CustomLogger {
     private let subsystem: String
     private let category: String
     private let logger: Logger
-    
+
     public init(subsystem: String, category: String) {
         self.subsystem = subsystem
         self.category = category
         self.logger = Logger(subsystem: subsystem, category: category)
     }
-    
+
     public func log(_ message: String) {
         logger.log("\(message)")
     }
-    
+
     public func log(level: OSLogType, _ message: String) {
         logger.log(level: level, "\(message)")
     }
-    
+
     public func trace(_ message: String) {
         logger.trace("\(message)")
     }
-    
+
     public func debug(_ message: String) {
         logger.debug("\(message)")
     }
-    
+
     public func info(_ message: String) {
         logger.info("\(message)")
     }
-    
+
     public func notice(_ message: String) {
         logger.notice("\(message)")
     }
-    
+
     public func warning(_ message: String) {
         logger.warning("\(message)")
     }
-    
+
     public func error(_ message: String) {
         logger.error("\(message)")
     }
-    
+
     public func critical(_ message: String) {
         logger.critical("\(message)")
     }
-    
+
     public func fault(_ message: String) {
         logger.fault("\(message)")
     }

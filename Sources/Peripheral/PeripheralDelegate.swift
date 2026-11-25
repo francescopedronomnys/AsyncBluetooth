@@ -6,7 +6,7 @@ import CoreBluetooth
 final class PeripheralDelegate: NSObject, Sendable {
     
     private static var logger: CustomLogger {
-        Logging.logger(for: "peripheralDelegate")
+        Logging.createLogger(for: "peripheralDelegate")
     }
 
     let context = PeripheralContext()
@@ -64,7 +64,7 @@ extension PeripheralDelegate: CBPeripheralDelegate {
     }
     
     func peripheral(_ cbPeripheral: CBPeripheral, didUpdateValueFor characteristic: CBCharacteristic, error: Error?) {
-        let eventData = CharacteristicValueUpdateEventData(characteristic: Characteristic(characteristic))
+        let eventData = CharacteristicValueUpdateEventData(characteristic: Characteristic(characteristic), error: error)
         
         if characteristic.isNotifying {
            self.context.characteristicValueUpdatedSubject.send(eventData)
